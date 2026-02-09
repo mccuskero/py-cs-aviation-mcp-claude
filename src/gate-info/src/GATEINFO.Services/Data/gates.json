@@ -1,0 +1,19 @@
+[
+  { "airport": "BDL", "gateNumber": "A1", "terminal": "Terminal A", "status": "Boarding", "assignedFlight": "DL1234", "airline": "Delta", "lastUpdated": "2026-02-09T14:00:00Z" },
+  { "airport": "BDL", "gateNumber": "A8", "terminal": "Terminal A", "status": "Open", "assignedFlight": "AA890", "airline": "American", "lastUpdated": "2026-02-09T15:30:00Z" },
+  { "airport": "BDL", "gateNumber": "B1", "terminal": "Terminal A", "status": "Closed", "assignedFlight": "", "airline": "", "lastUpdated": "2026-02-09T06:00:00Z" },
+  { "airport": "BDL", "gateNumber": "B3", "terminal": "Terminal A", "status": "Open", "assignedFlight": "UA567", "airline": "United", "lastUpdated": "2026-02-09T07:45:00Z" },
+  { "airport": "JFK", "gateNumber": "C22", "terminal": "Terminal 4", "status": "Boarding", "assignedFlight": "DL400", "airline": "Delta", "lastUpdated": "2026-02-09T08:30:00Z" },
+  { "airport": "JFK", "gateNumber": "D7", "terminal": "Terminal 7", "status": "Open", "assignedFlight": "BA178", "airline": "British Airways", "lastUpdated": "2026-02-09T18:00:00Z" },
+  { "airport": "JFK", "gateNumber": "B14", "terminal": "Terminal 8", "status": "Boarding", "assignedFlight": "AA100", "airline": "American", "lastUpdated": "2026-02-09T11:00:00Z" },
+  { "airport": "LAX", "gateNumber": "71A", "terminal": "Terminal 7", "status": "Closed", "assignedFlight": "UA200", "airline": "United", "lastUpdated": "2026-02-09T05:30:00Z" },
+  { "airport": "LAX", "gateNumber": "52B", "terminal": "Terminal 5", "status": "Open", "assignedFlight": "DL555", "airline": "Delta", "lastUpdated": "2026-02-09T12:30:00Z" },
+  { "airport": "LAX", "gateNumber": "40C", "terminal": "Terminal 4", "status": "Maintenance", "assignedFlight": "", "airline": "", "lastUpdated": "2026-02-09T09:00:00Z" },
+  { "airport": "ORD", "gateNumber": "C18", "terminal": "Terminal 1", "status": "Open", "assignedFlight": "UA300", "airline": "United", "lastUpdated": "2026-02-09T14:30:00Z" },
+  { "airport": "ORD", "gateNumber": "H12", "terminal": "Terminal 3", "status": "Boarding", "assignedFlight": "AA450", "airline": "American", "lastUpdated": "2026-02-09T11:30:00Z" },
+  { "airport": "ORD", "gateNumber": "A5", "terminal": "Terminal 1", "status": "Open", "assignedFlight": "SW800", "airline": "Southwest", "lastUpdated": "2026-02-09T18:00:00Z" },
+  { "airport": "ATL", "gateNumber": "T4", "terminal": "Terminal S", "status": "Open", "assignedFlight": "DL900", "airline": "Delta", "lastUpdated": "2026-02-09T07:00:00Z" },
+  { "airport": "ATL", "gateNumber": "A22", "terminal": "Terminal N", "status": "Boarding", "assignedFlight": "DL950", "airline": "Delta", "lastUpdated": "2026-02-09T09:30:00Z" },
+  { "airport": "ATL", "gateNumber": "C10", "terminal": "Terminal S", "status": "Closed", "assignedFlight": "", "airline": "", "lastUpdated": "2026-02-09T05:00:00Z" },
+  { "airport": "ATL", "gateNumber": "B8", "terminal": "Terminal N", "status": "Maintenance", "assignedFlight": "", "airline": "", "lastUpdated": "2026-02-09T13:00:00Z" }
+]

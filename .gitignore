@@ -205,3 +205,17 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# C# / .NET
+bin/
+obj/
+*.dll
+*.exe
+*.pdb
+*.cache
+.vs/
+*.user
+*.suo
+*.nupkg
+packages/
+*.DotSettings.user

@@ -1,0 +1,7 @@
+[
+  { "airport": "BDL", "condition": "Clear", "temperatureF": 28.0, "temperatureC": -2.2, "windSpeed": "10 mph NW", "visibility": "10 miles", "humidity": 45, "lastUpdated": "2026-02-09T12:00:00Z" },
+  { "airport": "JFK", "condition": "Cloudy", "temperatureF": 35.0, "temperatureC": 1.7, "windSpeed": "15 mph NE", "visibility": "8 miles", "humidity": 62, "lastUpdated": "2026-02-09T12:00:00Z" },
+  { "airport": "LAX", "condition": "Clear", "temperatureF": 68.0, "temperatureC": 20.0, "windSpeed": "5 mph W", "visibility": "10 miles", "humidity": 40, "lastUpdated": "2026-02-09T12:00:00Z" },
+  { "airport": "ORD", "condition": "Snow", "temperatureF": 22.0, "temperatureC": -5.6, "windSpeed": "20 mph N", "visibility": "3 miles", "humidity": 78, "lastUpdated": "2026-02-09T12:00:00Z" },
+  { "airport": "ATL", "condition": "Rain", "temperatureF": 48.0, "temperatureC": 8.9, "windSpeed": "12 mph SE", "visibility": "5 miles", "humidity": 85, "lastUpdated": "2026-02-09T12:00:00Z" }
+]

@@ -1,0 +1,69 @@
+services:
+  # C# microservices
+  flight-status:
+    build:
+      context: ./src/flight-status
+      dockerfile: Dockerfile
+    ports:
+      - "5001:5001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001/api/flights"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - aviation-net
+
+  gate-info:
+    build:
+      context: ./src/gate-info
+      dockerfile: Dockerfile
+    ports:
+      - "5002:5002"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5002/api/gates"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - aviation-net
+
+  weather:
+    build:
+      context: ./src/weather
+      dockerfile: Dockerfile
+    ports:
+      - "5003:5003"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5003/api/weather"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - aviation-net
+
+  # Python MCP server
+  aviation-mcp:
+    build:
+      context: ./src/aviation-mcp
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - FLIGHT_STATUS_URL=http://flight-status:5001
+      - GATE_INFO_URL=http://gate-info:5002
+      - WEATHER_URL=http://weather:5003
+      - MCP_DEBUG=true
+    depends_on:
+      flight-status:
+        condition: service_healthy
+      gate-info:
+        condition: service_healthy
+      weather:
+        condition: service_healthy
+    networks:
+      - aviation-net
+
+networks:
+  aviation-net:
+    driver: bridge
