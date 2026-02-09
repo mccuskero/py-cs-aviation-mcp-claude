@@ -1,0 +1,62 @@
+flowchart LR
+    subgraph Input
+        USER["User Query<br/><i>'What flights are at BDL?'</i>"]
+        TEST["Batch Test<br/><i>--test flag</i>"]
+    end
+
+    subgraph ClientLayer ["CLI Client"]
+        PARSE["Parse Args<br/><i>client.py</i>"]
+        AGENT["LangChain Agent<br/><i>agent.py</i>"]
+        RUNNER["Test Runner<br/><i>test_runner.py</i>"]
+    end
+
+    subgraph MCPLayer ["MCP Server"]
+        SSE["SSE Endpoint<br/><i>:8000/sse</i>"]
+        TOOL["Tool Router<br/><i>server.py</i>"]
+        HANDLER["Tool Handlers<br/><i>tools/*.py</i>"]
+        HTTP["HTTP Clients<br/><i>clients/*.py</i>"]
+    end
+
+    subgraph ServiceLayer ["C# Services"]
+        CTRL["Controllers<br/><i>[ApiController]</i>"]
+        SVC["Service Layer<br/><i>Filtering Logic</i>"]
+        JSON["JSON Data<br/><i>Stub Files</i>"]
+    end
+
+    subgraph Output
+        DISPLAY["Formatted<br/>Response"]
+        REPORT["Pass/Fail<br/>Report"]
+    end
+
+    USER --> PARSE
+    TEST --> PARSE
+    PARSE -->|Interactive| AGENT
+    PARSE -->|Batch| RUNNER
+    AGENT -->|MCP SSE| SSE
+    RUNNER -->|MCP SSE| SSE
+    SSE --> TOOL
+    TOOL --> HANDLER
+    HANDLER --> HTTP
+    HTTP -->|HTTP GET| CTRL
+    CTRL --> SVC
+    SVC --> JSON
+    JSON -->|JSON Array| SVC
+    SVC -->|Response| CTRL
+    CTRL -->|HTTP 200| HTTP
+    HTTP --> HANDLER
+    HANDLER -->|Formatted String| TOOL
+    TOOL --> SSE
+    AGENT --> DISPLAY
+    RUNNER --> REPORT
+
+    classDef input fill:#4a90d9,stroke:#2c5f8a,color:#fff
+    classDef client fill:#5a7fb5,stroke:#3d5a82,color:#fff
+    classDef mcp fill:#6b4fa0,stroke:#4a3570,color:#fff
+    classDef service fill:#2d8659,stroke:#1d5c3d,color:#fff
+    classDef output fill:#d4a843,stroke:#a07d28,color:#fff
+
+    class USER,TEST input
+    class PARSE,AGENT,RUNNER client
+    class SSE,TOOL,HANDLER,HTTP mcp
+    class CTRL,SVC,JSON service
+    class DISPLAY,REPORT output

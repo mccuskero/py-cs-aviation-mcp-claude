@@ -1,0 +1,52 @@
+graph TB
+    subgraph Client ["CLI Client (Host Machine)"]
+        REPL["Interactive REPL<br/><i>LangChain ReAct Agent</i>"]
+        BATCH["Batch Test Runner<br/><i>Direct MCP Calls</i>"]
+    end
+
+    subgraph LLM ["LLM Provider"]
+        direction TB
+        ANTHROPIC["Anthropic<br/>Claude"]
+        OPENAI["OpenAI<br/>GPT-4o"]
+        OLLAMA["Ollama<br/>Local Models"]
+    end
+
+    subgraph Docker ["Docker Compose (aviation-net)"]
+        MCP["Aviation MCP Server<br/><i>Python 3.13 / FastMCP</i><br/>Port 8000<br/>SSE Transport"]
+
+        subgraph Services ["C# Microservices (.NET 9)"]
+            FS["Flight Status<br/>Port 5001<br/><i>GET /api/flights</i>"]
+            GI["Gate Info<br/>Port 5002<br/><i>GET /api/gates</i>"]
+            WX["Weather<br/>Port 5003<br/><i>GET /api/weather</i>"]
+        end
+
+        subgraph Data ["JSON Stub Data"]
+            FD[("flights.json<br/>5 airports<br/>16 flights")]
+            GD[("gates.json<br/>5 airports<br/>17 gates")]
+            WD[("weather.json<br/>5 airports")]
+        end
+    end
+
+    REPL -->|SSE| MCP
+    BATCH -->|SSE| MCP
+    REPL -.->|Tool Selection| LLM
+
+    MCP -->|HTTP GET| FS
+    MCP -->|HTTP GET| GI
+    MCP -->|HTTP GET| WX
+
+    FS --- FD
+    GI --- GD
+    WX --- WD
+
+    classDef client fill:#4a90d9,stroke:#2c5f8a,color:#fff
+    classDef mcp fill:#6b4fa0,stroke:#4a3570,color:#fff
+    classDef service fill:#2d8659,stroke:#1d5c3d,color:#fff
+    classDef data fill:#d4a843,stroke:#a07d28,color:#fff
+    classDef llm fill:#c75050,stroke:#943a3a,color:#fff
+
+    class REPL,BATCH client
+    class MCP mcp
+    class FS,GI,WX service
+    class FD,GD,WD data
+    class ANTHROPIC,OPENAI,OLLAMA llm

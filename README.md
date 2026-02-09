@@ -4,10 +4,7 @@ A cross-language architecture demonstration: a Python MCP server calling C# back
 
 ## Architecture
 
-```
-LangChain CLI Client ──SSE──> Python MCP Server ──HTTP──> C# Microservices ──> JSON Stubs
-                                  (port 8000)         (ports 5001-5003)
-```
+![Architecture Diagram](docs/pics/architecture.png)
 
 The system has four services orchestrated via Docker Compose:
 
@@ -22,10 +19,16 @@ The CLI client runs on the host machine and connects to the MCP server via SSE.
 
 ### Data Flow
 
+![Flow Diagram](docs/pics/flow.png)
+
 1. **Client** sends a natural language query (interactive) or calls an MCP tool directly (batch)
 2. **MCP Server** receives the tool call, translates it into an HTTP GET to the appropriate C# service
 3. **C# Service** filters parameterized JSON stub data and returns results
 4. **MCP Server** formats the response and returns it to the client
+
+### Request Sequence
+
+![Sequence Diagram](docs/pics/sequence.png)
 
 ### MCP Tools
 

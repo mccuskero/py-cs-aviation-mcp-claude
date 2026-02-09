@@ -1,0 +1,64 @@
+sequenceDiagram
+    actor User
+    participant Client as CLI Client
+    participant MCP as MCP Server<br/>(Python :8000)
+    participant FS as Flight Status<br/>(C# :5001)
+    participant GI as Gate Info<br/>(C# :5002)
+    participant WX as Weather<br/>(C# :5003)
+
+    Note over Client,WX: Startup (docker-compose up)
+    FS-->>FS: Load flights.json
+    GI-->>GI: Load gates.json
+    WX-->>WX: Load weather.json
+    FS-->>MCP: Health check passes
+    GI-->>MCP: Health check passes
+    WX-->>MCP: Health check passes
+    Note over MCP: Registers 3 MCP tools
+
+    Note over User,WX: Batch Test Mode (--test)
+    User->>Client: python -m src.client --test
+    Client->>MCP: SSE connect
+    MCP-->>Client: Session initialized (3 tools)
+
+    rect rgb(240, 248, 255)
+        Note over Client,FS: Test: Flight lookup at BDL
+        Client->>MCP: call_tool("get_flight_status", {airport: "BDL"})
+        MCP->>FS: GET /api/flights?airport=BDL
+        FS-->>MCP: 200 OK [{flight: "DL1234"}, ...]
+        MCP-->>Client: [PASS] Non-empty result
+    end
+
+    rect rgb(240, 255, 240)
+        Note over Client,GI: Test: Gates at JFK
+        Client->>MCP: call_tool("get_gate_info", {airport: "JFK"})
+        MCP->>GI: GET /api/gates?airport=JFK
+        GI-->>MCP: 200 OK [{gate: "C22"}, ...]
+        MCP-->>Client: [PASS] Non-empty result
+    end
+
+    rect rgb(255, 248, 240)
+        Note over Client,WX: Test: Weather at LAX
+        Client->>MCP: call_tool("get_weather", {airport: "LAX"})
+        MCP->>WX: GET /api/weather?airport=LAX
+        WX-->>MCP: 200 OK [{condition: "Clear"}, ...]
+        MCP-->>Client: [PASS] Non-empty result
+    end
+
+    rect rgb(255, 240, 240)
+        Note over Client,FS: Test: Unknown airport
+        Client->>MCP: call_tool("get_flight_status", {airport: "XXX"})
+        MCP->>FS: GET /api/flights?airport=XXX
+        FS-->>MCP: 200 OK []
+        MCP-->>Client: [PASS] Empty result expected
+    end
+
+    Client-->>User: Results: 8/8 passed (exit 0)
+
+    Note over User,WX: Interactive Mode (REPL)
+    User->>Client: "What flights are at BDL?"
+    Client->>Client: LangChain Agent selects tool
+    Client->>MCP: call_tool("get_flight_status", {airport: "BDL"})
+    MCP->>FS: GET /api/flights?airport=BDL
+    FS-->>MCP: 200 OK [{...}, ...]
+    MCP-->>Client: Formatted flight data
+    Client-->>User: "There are 4 flights at BDL..."
