@@ -97,7 +97,9 @@ py-cs-aviation-mcp-claude/
     # 2. Wait ~60s for health checks, then verify
     docker-compose ps
 
-    # 3. Run batch tests (no LLM key needed)
+    docker-compose logs -f
+
+    # 3. Run batch tests (no LLM key neededm in another window)
     cd src/aviation-mcp-client
     uv run python -m src.client --test --mcp-url http://localhost:8000/sse
 

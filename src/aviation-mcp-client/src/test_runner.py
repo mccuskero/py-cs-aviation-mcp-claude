@@ -1,10 +1,16 @@
-import json
 from dataclasses import dataclass
 
 from mcp import ClientSession
 from mcp.client.sse import sse_client
 
 from src.config import Config
+
+# Phrases the MCP tool handlers return when no data matches the query
+_EMPTY_PHRASES = (
+    "No flights found",
+    "No gate information found",
+    "No weather data found",
+)
 
 
 @dataclass
@@ -52,27 +58,27 @@ TEST_SCENARIOS = [
 
 
 def check_result(result, scenario: TestScenario) -> bool:
-    """Validate a tool call result against the expected check."""
+    """Validate a tool call result against the expected check.
+
+    MCP tool handlers return formatted text strings, not JSON.
+    - Non-empty results: "Flight DL1234 (Delta): BDL -> ATL, ..."
+    - Empty results: "No flights found matching the criteria."
+    """
     try:
-        # MCP CallToolResult has .content which is a list of TextContent
         if not result.content:
-            text = "[]"
+            text = ""
         else:
             text = result.content[0].text
 
-        data = json.loads(text)
+        is_empty = not text or any(phrase in text for phrase in _EMPTY_PHRASES)
 
         if scenario.expected_check == "non_empty":
-            if isinstance(data, list):
-                return len(data) > 0
-            return bool(data)
+            return not is_empty
         elif scenario.expected_check == "empty":
-            if isinstance(data, list):
-                return len(data) == 0
-            return not data
+            return is_empty
         else:
             return False
-    except (json.JSONDecodeError, IndexError, AttributeError):
+    except (IndexError, AttributeError):
         return False
 
 
@@ -104,6 +110,8 @@ async def run_batch_tests(config: Config) -> bool:
 
                 status = "PASS" if passed else "FAIL"
                 print(f"  [{status}] {scenario.name}")
+                text = result.content[0].text if result.content else "(empty)"
+                print(f"         -> {text[:120]}")
                 if passed:
                     passed_count += 1
 

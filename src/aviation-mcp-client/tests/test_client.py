@@ -114,44 +114,57 @@ def _mock_result(text: str) -> MagicMock:
 
 
 class TestCheckResult:
-    def test_non_empty_with_data(self):
-        result = _mock_result('[{"airport": "BDL", "flight": "DL1234"}]')
+    def test_non_empty_with_flight_data(self):
+        result = _mock_result(
+            "Flight DL1234 (Delta): BDL -> ATL, Status: On Time, Gate: A12"
+        )
         scenario = TestScenario("test", "tool", {}, "non_empty")
         assert check_result(result, scenario) is True
 
-    def test_non_empty_with_empty_list(self):
-        result = _mock_result("[]")
+    def test_non_empty_with_gate_data(self):
+        result = _mock_result(
+            "Gate C22 (C): Status: Boarding, Flight: DL400, Airline: Delta"
+        )
         scenario = TestScenario("test", "tool", {}, "non_empty")
-        assert check_result(result, scenario) is False
+        assert check_result(result, scenario) is True
 
-    def test_empty_with_empty_list(self):
-        result = _mock_result("[]")
+    def test_non_empty_with_weather_data(self):
+        result = _mock_result(
+            "LAX: Clear, 68.0°F / 20.0°C, Wind: 5 mph W, Visibility: 10 miles, Humidity: 40%"
+        )
+        scenario = TestScenario("test", "tool", {}, "non_empty")
+        assert check_result(result, scenario) is True
+
+    def test_empty_no_flights(self):
+        result = _mock_result("No flights found matching the criteria.")
         scenario = TestScenario("test", "tool", {}, "empty")
         assert check_result(result, scenario) is True
 
-    def test_empty_with_data(self):
-        result = _mock_result('[{"airport": "BDL"}]')
+    def test_empty_no_gates(self):
+        result = _mock_result("No gate information found matching the criteria.")
         scenario = TestScenario("test", "tool", {}, "empty")
-        assert check_result(result, scenario) is False
+        assert check_result(result, scenario) is True
 
-    def test_invalid_json(self):
-        result = _mock_result("not json")
+    def test_empty_no_weather(self):
+        result = _mock_result("No weather data found for the specified airport.")
+        scenario = TestScenario("test", "tool", {}, "empty")
+        assert check_result(result, scenario) is True
+
+    def test_non_empty_fails_when_no_data(self):
+        result = _mock_result("No flights found matching the criteria.")
         scenario = TestScenario("test", "tool", {}, "non_empty")
         assert check_result(result, scenario) is False
 
-    def test_empty_content(self):
+    def test_empty_fails_when_data_present(self):
+        result = _mock_result(
+            "Flight DL1234 (Delta): BDL -> ATL, Status: On Time, Gate: A12"
+        )
+        scenario = TestScenario("test", "tool", {}, "empty")
+        assert check_result(result, scenario) is False
+
+    def test_empty_content_list(self):
         result = MagicMock()
         result.content = []
-        scenario = TestScenario("test", "tool", {}, "empty")
-        assert check_result(result, scenario) is True
-
-    def test_non_empty_dict_result(self):
-        result = _mock_result('{"airport": "BDL", "temperature": 28}')
-        scenario = TestScenario("test", "tool", {}, "non_empty")
-        assert check_result(result, scenario) is True
-
-    def test_empty_dict_result(self):
-        result = _mock_result("{}")
         scenario = TestScenario("test", "tool", {}, "empty")
         assert check_result(result, scenario) is True
 
@@ -166,15 +179,17 @@ class TestRunBatchTests:
         mock_session = AsyncMock()
         mock_session.initialize = AsyncMock()
 
-        # Return non-empty for positive tests, empty for negative tests
+        # Return formatted text for positive tests, "No ... found" for negative tests
         async def mock_call_tool(tool_name, params):
             airport = params.get("airport", "")
             gate_number = params.get("gate_number", "")
             if airport == "XXX":
-                return _mock_result("[]")
+                if "flight" in tool_name:
+                    return _mock_result("No flights found matching the criteria.")
+                return _mock_result("No weather data found for the specified airport.")
             if gate_number == "Z99":
-                return _mock_result("[]")
-            return _mock_result('[{"data": "test"}]')
+                return _mock_result("No gate information found matching the criteria.")
+            return _mock_result("Flight DL1234 (Delta): BDL -> ATL, Status: On Time")
 
         mock_session.call_tool = AsyncMock(side_effect=mock_call_tool)
 
@@ -199,8 +214,10 @@ class TestRunBatchTests:
         """Batch runner detects failures when results don't match expectations."""
         mock_session = AsyncMock()
         mock_session.initialize = AsyncMock()
-        # Return empty for all calls — positive tests will fail
-        mock_session.call_tool = AsyncMock(return_value=_mock_result("[]"))
+        # Return "no data" for all calls — positive tests will fail
+        mock_session.call_tool = AsyncMock(
+            return_value=_mock_result("No flights found matching the criteria.")
+        )
 
         mock_sse = AsyncMock()
         mock_sse.__aenter__ = AsyncMock(return_value=(MagicMock(), MagicMock()))
